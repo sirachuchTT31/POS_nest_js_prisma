@@ -1,22 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAuth } from './dto/base-auth.dto';
-
+import { SignIn } from './dto/base-auth.dto';
+import { Prisma } from '@prisma/client';
+import { DatabaseService } from 'src/database/database.service';
 @Injectable()
 export class AuthenticationService {
-    constructor() { }
-    public mock_data_user: Array<BaseAuth> = [
-        {
-            userId: '01',
-            userName: 'John',
-            passWord: '1234'
-        },
-        {
-            userId: '02',
-            userName: 'Jame',
-            passWord: '1234'
+    constructor(
+        private  dbService: DatabaseService) { }
+
+    async FindoneUser(username: string): Promise<SignIn> {
+        return await this.dbService?.users?.findFirst({ where: { username: username }, select: { id: true, username: true, password: true } })
+        // FIXME:MOCKUP
+        // return {
+        //     id: '',
+        //     username: '',
+        //     password: ''
+        // }
+    }
+
+    async CreateUser(UserCreateInputModel: Prisma.UsersCreateInput) {
+        // let response = await this.dbService?.users?.create({
+        //     data: {
+        //         username: 'demo01',
+        //         password: '1234',
+        //         address: 'demo',
+        //         email: 'demo@example.com',
+        //         first_name: 'accountdemo',
+        //         last_name: 'accountdemo',
+
+        //     }
+        // })
+        let response
+        if (response) {
+            return true
         }
-    ]
-    async findOne(userName: string): Promise<BaseAuth> {
-        return this.mock_data_user.find((rs: any) => rs?.userName === userName)
+        else {
+            return false
+        }
     }
 }

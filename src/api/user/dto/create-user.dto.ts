@@ -13,9 +13,9 @@ export class CreateUserDto {
     @ApiProperty()
     password: string
     @ApiProperty({ default: "DEMO" })
-    role_active: Role
+    role_active?: Role
     @ApiProperty({ default: false })
-    first_login: boolean
+    first_login?: boolean
 }
 export class CreateUserSettingDto {
     @ApiProperty()

@@ -1,5 +1,5 @@
-export interface BaseAuth {
-    userId: string
-    userName: string
-    passWord: string
+export interface SignIn {
+    id: string
+    username: string
+    password: string
 }
