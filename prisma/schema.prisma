@@ -20,7 +20,7 @@ model Users {
   email       String       @db.VarChar(50)
   address     String       @db.VarChar(100)
   username    String       @db.VarChar(30)
-  password    String       @db.VarChar(30)
+  password    String       @db.VarChar(100)
   role_active Role         @default(DEMO)
   first_login Boolean      @default(false)
   UserSetting UserSetting? @relation(fields: [setting_id], references: [setting_code]) //1-1 relationship
@@ -30,10 +30,20 @@ model Users {
 }
 
 model UserSetting {
-  id           String  @id @default(uuid()) @db.Uuid
-  setting_code String  @unique
-  is_default   Setting @default(DEFAULT)
+  id           String        @id @default(uuid()) @db.Uuid
+  setting_code String        @unique
+  is_default   Setting       @default(DEFAULT)
   Users        Users? //1-1 relationship
+  ThemeConfig  ThemeConfig[] //1-n relationship
+}
+
+model ThemeConfig {
+  id            String       @id @default(uuid()) @db.Uuid
+  theme_code    String       @unique
+  bg_color      String?      @db.VarChar(255)
+  logo          String?      @db.VarChar(255)
+  UserSetting   UserSetting? @relation(fields: [userSettingId], references: [id]) //1-n relationship
+  userSettingId String?      @db.Uuid
 }
 
 enum Setting {

@@ -1,15 +1,16 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
 import { UserModule } from 'src/api/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { env } from 'process';
-import { DatabaseModule } from 'src/database/database.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
   imports: [
-    DatabaseModule,
-    UserModule,
+    // DatabaseModule,
+    PrismaModule,
     JwtModule.register(
       {
         global: true,
@@ -21,6 +22,9 @@ import { DatabaseModule } from 'src/database/database.module';
   ],
   exports: [AuthenticationModule],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService],
+  providers: [
+    AuthenticationService,
+    PrismaService
+  ],
 })
 export class AuthenticationModule { }

@@ -1,40 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { SignIn } from './dto/base-auth.dto';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from 'src/database/database.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class AuthenticationService {
-    constructor(
-        private  dbService: DatabaseService) { }
+    constructor(private prismaService: PrismaService) { }
+    async findOneUser(username: string): Promise<SignIn> {
+        // FIXME: Check username is 0,1
+        return await this.prismaService.users.findFirst({
+            where: { username: username },
+            select: {
+                id: true, username: true, password: true
+            }
+        })
 
-    async FindoneUser(username: string): Promise<SignIn> {
-        return await this.dbService?.users?.findFirst({ where: { username: username }, select: { id: true, username: true, password: true } })
-        // FIXME:MOCKUP
-        // return {
-        //     id: '',
-        //     username: '',
-        //     password: ''
-        // }
     }
 
     async CreateUser(UserCreateInputModel: Prisma.UsersCreateInput) {
-        // let response = await this.dbService?.users?.create({
-        //     data: {
-        //         username: 'demo01',
-        //         password: '1234',
-        //         address: 'demo',
-        //         email: 'demo@example.com',
-        //         first_name: 'accountdemo',
-        //         last_name: 'accountdemo',
-
-        //     }
-        // })
-        let response
-        if (response) {
+        let response = await this.prismaService?.users?.create({
+            data: UserCreateInputModel
+        }).then((value) => {
             return true
-        }
-        else {
-            return false
-        }
+        }).catch((e) => {
+            throw e
+            // return 
+        })
+        return response
     }
 }
