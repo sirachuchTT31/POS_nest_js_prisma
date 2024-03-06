@@ -35,6 +35,8 @@ model UserSetting {
   is_default   Setting       @default(DEFAULT)
   Users        Users? //1-1 relationship
   ThemeConfig  ThemeConfig[] //1-n relationship
+  created_at   DateTime      @default(now()) @db.Timestamptz(3)
+  updated_at   DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 model ThemeConfig {
@@ -44,6 +46,8 @@ model ThemeConfig {
   logo          String?      @db.VarChar(255)
   UserSetting   UserSetting? @relation(fields: [userSettingId], references: [id]) //1-n relationship
   userSettingId String?      @db.Uuid
+  created_at    DateTime     @default(now()) @db.Timestamptz(3)
+  updated_at    DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
 }
 
 enum Setting {
