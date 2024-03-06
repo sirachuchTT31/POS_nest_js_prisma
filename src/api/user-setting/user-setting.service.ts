@@ -21,8 +21,19 @@ export class UserSettingService {
     return response
   }
 
-  findAll() {
-    return `This action returns all userSetting`;
+  async findAll() {
+    let response = await this.prismaService.userSetting.findMany(
+      {
+        orderBy: {
+          created_at: 'desc'
+        }
+      }
+    ).then((value) => {
+      return value
+    }).catch((e) => {
+      throw e
+    })
+    return response
   }
 
   findOne(id: number) {

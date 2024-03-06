@@ -17,7 +17,7 @@ export class AuthenticationService {
     }
 
     async CreateUser(UserCreateInputModel: Prisma.UsersCreateInput) {
-        let response = await this.prismaService?.users?.create({
+        let response = await this.prismaService?.users?.createMany({
             data: UserCreateInputModel
         }).then((value) => {
             return true

@@ -1,23 +1,27 @@
 
 import { AuthenticationService } from './authentication.service';
-import { baseResult } from 'src/shared/interface/baseResult.model';
+import { BaseResultObject } from 'src/shared/interface/baseResult.model';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, UnauthorizedException, Res } from '@nestjs/common';
 import { SignInDto } from './dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { env } from 'process';
 import { RegisterUserDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { UserSettingService } from 'src/api/user-setting/user-setting.service';
+import { UserSettingController } from 'src/api/user-setting/user-setting.controller';
+import express, { Request, Response } from 'express';
 @ApiTags('authentication')
 @Controller('authentication')
 export class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService,
     private jwtService: JwtService,
+    private usersettingController: UserSettingController
   ) {
   }
   @Post('login')
-  async Login(@Body() signinDto: SignInDto): Promise<baseResult> {
+  async Login(@Body() signinDto: SignInDto): Promise<BaseResultObject> {
     const responseService = await this.authenticationService.findOneUser(signinDto?.username);
     //POST BODY REQUEST
     const textPassword = signinDto?.password
@@ -43,32 +47,37 @@ export class AuthenticationController {
     }
   }
   @Post('register')
-  async Register(@Body() registerDto: RegisterUserDto): Promise<baseResult> {
+  async Register(@Body() registerDto: RegisterUserDto, @Res() res: Response, exception: HttpException): Promise<BaseResultObject | any> {
     const salt = 10
     const password = registerDto?.password
     const hashPassword = await bcrypt.hash(password, salt)
+    //CREATE GENNARATE AUTO setting_code
+    const response = await this.usersettingController.create()
     const payloadData = {
       first_name: registerDto?.first_name,
       last_name: registerDto?.last_name,
       email: registerDto?.email,
       address: registerDto?.address,
       username: registerDto?.username,
-      password: hashPassword
+      password: hashPassword,
+      setting_id: response?.result
     }
     const responseService = await this.authenticationService.CreateUser(payloadData);
-    if (responseService === false) {
-      throw new HttpException(
-        'Register fail',
-        HttpStatus.BAD_REQUEST,
-      );
+    if (responseService === true) {
+      return res.status(200).json({
+        status: true,
+        status_code: HttpStatus.OK,
+        message: exception?.message,
+        result: null
+      })
     }
     else {
-      return {
-        result: null,
-        status: true,
-        status_code: 200,
-        message: 'Registration successfully'
-      }
+      return res.status(500).json({
+        status: false,
+        status_code: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: exception?.message,
+        result: null
+      })
     }
   }
 }
