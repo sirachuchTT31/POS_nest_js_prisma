@@ -77,3 +77,4 @@ nest g resource name // GENARATE REST API
 ## DATABASE 
 npx prisma migrate dev --name init // first migrate 
 npx prisma migrate dev --name dsc // second migrate
+every thing clone db mrigrate init
